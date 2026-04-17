@@ -1,56 +1,67 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const path = require("path");
 
 const app = express();
 
+// Middleware
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect("mongodb://127.0.0.1:27017/dashboard")
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, "public")));
 
-// USER SCHEMA
-const UserSchema = new mongoose.Schema({
-    name: String,
-    phone: String,
-    email: String,
-    password: String
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.log(err));
+
+// Example User schema (if not already defined)
+const userSchema = new mongoose.Schema({
+  email: String,
+  password: String
 });
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", userSchema);
 
-// REGISTER
-app.post("/register", async (req, res) => {
-    const { name, phone, email, password } = req.body;
+// Routes
 
-    const hash = await bcrypt.hash(password, 10);
-
-    await User.create({ name, phone, email, password: hash });
-
-    res.send("Registered successfully");
-});
-
-// LOGIN
-app.post("/login", async (req, res) => {
-    const { identifier, password } = req.body;
-
-    const user = await User.findOne({
-        $or: [{ email: identifier }, { phone: identifier }]
-    });
-
-    if (!user) return res.send("User not found");
-
-    const valid = await bcrypt.compare(password, user.password);
-
-    if (!valid) return res.send("Wrong password");
-
-    res.send("Login success");
-});
+// Homepage → show index.html
 app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
+
+// Register
+app.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await User.create({
+    email,
+    password: hashedPassword
+  });
+
+  res.send("Registered successfully");
+});
+
+// Login
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) return res.send("User not found");
+
+  const valid = await bcrypt.compare(password, user.password);
+
+  if (!valid) return res.send("Wrong password");
+
+  res.send("Login success");
+});
+
+// Port (IMPORTANT for Render)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
