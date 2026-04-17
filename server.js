@@ -11,41 +11,73 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// MongoDB connection
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.log(err));
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.log(err));
 
-// ROUTE FOR HOME PAGE (VERY IMPORTANT)
+// Simple User Schema
+const UserSchema = new mongoose.Schema({
+  email: String,
+  password: String
+});
+
+const User = mongoose.model("User", UserSchema);
+
+// HOME PAGE
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Example login route
-app.post("/login", async (req, res) => {
-  res.send("Login route working");
-});
 
-  app.post("/register", async (req, res) => {
+// REGISTER ROUTE ✅
+app.post("/register", async (req, res) => {
   const { email, password } = req.body;
 
-  console.log("Register:", email, password);
+  try {
+    const newUser = new User({ email, password });
+    await newUser.save();
 
- res.send(`
-<!DOCTYPE html>
-<html>
-<body>
-<script>
-alert("Registered successfully!");
-window.location.href = "/index.html";
-</script>
-</body>
-</html>
-`);
+    console.log("User Registered:", email);
 
+    // Redirect to login page
+    res.redirect("/index.html");
+
+  } catch (err) {
+    console.log(err);
+    res.send("Error registering user");
+  }
 });
 
-// Port (IMPORTANT for Render)
+
+// LOGIN ROUTE ✅
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.send("User not found");
+    }
+
+    if (user.password !== password) {
+      return res.send("Wrong password");
+    }
+
+    console.log("Login success:", email);
+
+    // Redirect to dashboard
+    res.redirect("/dashboard.html");
+
+  } catch (err) {
+    console.log(err);
+    res.send("Login error");
+  }
+});
+
+
+// PORT (IMPORTANT for Render)
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
