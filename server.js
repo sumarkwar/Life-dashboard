@@ -31,7 +31,12 @@ app.post("/login", async (req, res) => {
 
   console.log("Register:", email, password);
 
-  res.send("Register working");
+  res.send(`
+  <script>
+    alert("Registered successfully!");
+    window.location.href = "/index.html";
+  </script>
+`);
 
 });
 
