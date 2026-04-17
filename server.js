@@ -26,6 +26,15 @@ app.post("/login", async (req, res) => {
   res.send("Login route working");
 });
 
+  app.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+
+  console.log("Register:", email, password);
+
+  res.send("Register working");
+
+});
+
 // Port (IMPORTANT for Render)
 const PORT = process.env.PORT || 3000;
 
