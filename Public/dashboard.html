@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter';
+    background: #020617;
+    color: #e2e8f0;
+}
+
+.navbar {
+    height: 60px;
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 220px;
+    padding: 20px;
+}
+
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+.cards {
+    display: flex;
+    gap: 15px;
+}
+
+.card {
+    flex: 1;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    padding: 10px;
+    border-radius: 8px;
+    background: linear-gradient(45deg,#38bdf8,#6366f1);
+    color: white;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div>Life Admin</div>
+    <div>👤 User</div>
+</div>
+
+<div class="container">
+
+<div class="sidebar">
+    <p>Dashboard</p>
+    <p>Tasks</p>
+    <p>Expenses</p>
+</div>
+
+<div class="main">
+
+<div class="cards">
+    <div class="card">Tasks: <span id="taskCount">0</span></div>
+    <div class="card">Expenses: ₹<span id="expenseTotal">0</span></div>
+</div>
+
+<h3>Add Task</h3>
+<input id="task">
+<button onclick="addTask()">Add</button>
+
+<h3>Add Expense</h3>
+<input id="amount">
+<button onclick="addExpense()">Add</button>
+
+<canvas id="chart"></canvas>
+
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
